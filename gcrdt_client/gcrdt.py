@@ -38,8 +38,8 @@ class CRDTGraphClient:
 
     def get_neighbors(self, u):
         response = requests.get(f"{self.host}/get_neighbors/{u}")
-        return response.json()
+        return response.json()["data"]
 
     def clear(self):
         response = requests.get(f"{self.host}/clear")
-        return response.json()
+        return response.json()["data"]

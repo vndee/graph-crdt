@@ -1,4 +1,3 @@
-import logging
 import uvicorn
 from fastapi import FastAPI
 from graph_crdt import CRDTGraph
@@ -105,7 +104,7 @@ class DatabaseCluster:
     @communication_server.get("/get_neighbors/{u}")
     async def get_neighbors(u: int):
         _, status = DatabaseCluster.database_instance.get_neighbors(u)
-        return DatabaseCluster.response(_, data=status, success_msg=f"check_exists {u}-{v}: {status}")
+        return DatabaseCluster.response(_, data=status, success_msg=f"Successfully get neighbors of {status}")
 
     @staticmethod
     @communication_server.get("/find_path/{u}/{v}")

@@ -31,13 +31,17 @@ class CRDTGraph:
         try:
             neighbors = list()
             if self.contains_vertex(u)[1] is False:
-                return neighbors
+                return False, neighbors
 
             for node in list(self.vertices.added.keys()):
+                if node == u:
+                    continue
+
                 if self.contains_vertex(node)[1]:
+                    _u, _node = u, node
                     u, node = self.convert_edge(u, node)
                     if self.contains_edge(u, node)[1]:
-                        neighbors.append(node)
+                        neighbors.append(_node)
 
             return True, neighbors
         except Exception as e:
@@ -79,7 +83,7 @@ class CRDTGraph:
 
     def remove_edge(self, u, v):
         u, v = self.convert_edge(u, v)
-        self.edges.remove((u, v))
+        return self.edges.remove((u, v))
 
     def contains_vertex(self, u):
         added_timestamp, removed_timestamp = None, None
@@ -134,8 +138,9 @@ class CRDTGraph:
             visited, trace = set(), dict()
             trace[source] = source
 
-            while q.__len__() - head > 1:
+            while q.__len__() - head > 0:
                 u = q[head]
+                head = head + 1
                 visited.add(u)
 
                 if u == target:

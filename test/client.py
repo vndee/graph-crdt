@@ -7,26 +7,73 @@ class CRDTGraphClientTestCase(unittest.TestCase):
 
     def test_add_vertex(self):
         instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
-        instance.clear()
+        self.assertTrue(instance.clear())
         self.assertEqual(instance.add_vertex(1)["status"], "Success")
         self.assertEqual(instance.add_vertex(1)["status"], "Error")
 
+    def test_exists_vertex(self):
+        instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
+        self.assertTrue(instance.clear())
+        self.assertEqual(instance.add_vertex(1)["status"], "Success")
+        self.assertEqual(instance.add_vertex(1)["status"], "Error")
+        self.assertTrue(instance.exists_vertex(1))
+
     def test_remove_vertex(self):
         instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
-        instance.clear()
+        self.assertTrue(instance.clear())
         self.assertEqual(instance.add_vertex(1)["status"], "Success")
         self.assertEqual(instance.remove_vertex(1)["status"], "Success")
         self.assertEqual(instance.remove_vertex(1)["status"], "Error")
 
     def test_add_edge(self):
         instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
-        instance.clear()
+        self.assertTrue(instance.clear())
         self.assertEqual(instance.add_vertex(1)["status"], "Success")
         self.assertEqual(instance.add_vertex(2)["status"], "Success")
         self.assertEqual(instance.add_edge(1, 2)["status"], "Success")
         self.assertTrue(instance.exists_edge(1, 2))
         self.assertEqual(instance.add_edge(1, 2)["status"], "Error")
-        print(instance.find_path(1, 2))
+
+    def test_exists_edge(self):
+        instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
+        self.assertTrue(instance.clear())
+        self.assertEqual(instance.add_vertex(1)["status"], "Success")
+        self.assertEqual(instance.add_vertex(2)["status"], "Success")
+        self.assertEqual(instance.add_edge(1, 2)["status"], "Success")
+        self.assertTrue(instance.exists_edge(1, 2))
+
+    def test_remove_edge(self):
+        instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
+        self.assertTrue(instance.clear())
+        self.assertEqual(instance.add_vertex(1)["status"], "Success")
+        self.assertEqual(instance.add_vertex(2)["status"], "Success")
+        self.assertEqual(instance.add_edge(1, 2)["status"], "Success")
+        self.assertTrue(instance.exists_edge(1, 2))
+        self.assertEqual(instance.remove_edge(1, 2)["status"], "Success")
+        self.assertFalse(instance.exists_edge(1, 2))
+
+    def test_find_path(self):
+        instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
+        self.assertTrue(instance.clear())
+        self.assertEqual(instance.add_vertex(1)["status"], "Success")
+        self.assertEqual(instance.add_vertex(2)["status"], "Success")
+        self.assertEqual(instance.add_vertex(3)["status"], "Success")
+        self.assertEqual(instance.add_edge(1, 2)["status"], "Success")
+        self.assertEqual(instance.find_path(1, 2)["data"], [1, 2])
+        self.assertEqual(instance.add_edge(1, 3)["status"], "Success")
+        self.assertEqual(instance.find_path(2, 3)["data"], [2, 1, 3])
+
+    def test_get_neighbors(self):
+        instance = CRDTGraphClient(CRDTGraphClientTestCase.connection_string)
+        self.assertTrue(instance.clear())
+        self.assertEqual(instance.add_vertex(1)["status"], "Success")
+        self.assertEqual(instance.add_vertex(2)["status"], "Success")
+        self.assertEqual(instance.add_vertex(3)["status"], "Success")
+        self.assertEqual(instance.add_edge(1, 2)["status"], "Success")
+        self.assertEqual(instance.find_path(1, 2)["data"], [1, 2])
+        self.assertEqual(instance.add_edge(1, 3)["status"], "Success")
+        self.assertEqual(instance.find_path(2, 3)["data"], [2, 1, 3])
+        self.assertEqual(instance.get_neighbors(1), [2, 3])
 
 
 if __name__ == "__main__":
