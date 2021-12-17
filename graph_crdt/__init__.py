@@ -1,2 +1,2 @@
 from .graph import CRDTGraph
-from .instance import DatabaseCluster
+from .gateway import DatabaseGateway
