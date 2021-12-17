@@ -1,4 +1,7 @@
 from .lww import LWWSet
+from .utils import get_logger
+
+logger = get_logger("Graph")
 
 
 class CRDTGraph:
@@ -19,47 +22,57 @@ class CRDTGraph:
     def list_nodes(self):
         nodes = list()
         for node in list(self.vertices.added.keys()):
-            if self.contains_vertex(node):
+            if self.contains_vertex(node)[1]:
                 nodes.append(node)
 
         return nodes
 
     def get_neighbors(self, u):
-        neighbors = list()
-        if self.contains_vertex(u) is False:
-            return neighbors
+        try:
+            neighbors = list()
+            if self.contains_vertex(u)[1] is False:
+                return neighbors
 
-        for node in list(self.vertices.added.keys()):
-            if self.contains_vertex(node):
-                u, node = self.convert_edge(u, node)
-                if self.contains_edge(u, node):
-                    neighbors.append(node)
+            for node in list(self.vertices.added.keys()):
+                if self.contains_vertex(node)[1]:
+                    u, node = self.convert_edge(u, node)
+                    if self.contains_edge(u, node)[1]:
+                        neighbors.append(node)
 
-        return neighbors
+            return True, neighbors
+        except Exception as e:
+            logger.exception(e)
+            return False, []
 
     def add_vertex(self, u):
-        return self.vertices.add(u)
+        if self.contains_vertex(u)[1]:
+            return False, "Duplicated"
+
+        return self.vertices.add(u), ""
 
     def add_edge(self, u, v):
         # check if u and v exists
-        if self.contains_vertex(u) is False or self.contains_vertex(v) is False:
-            return False
+        if self.contains_vertex(u)[1] is False or self.contains_vertex(v)[1] is False:
+            return False, "Not valid vertex"
+
+        if self.contains_edge(u, v)[1]:
+            return False, "Duplicated"
 
         u, v = self.convert_edge(u, v)
         self.edges.add((u, v))
-        return True
+        return True, ""
 
     def remove_vertex(self, u):
-        if self.contains_vertex(u) is False:
+        if self.contains_vertex(u)[1] is False:
             return False
 
         self.vertices.remove(u)
 
         # remove all connected edges of u
         for node in list(self.vertices.added.keys()):
-            if self.contains_vertex(node):
+            if self.contains_vertex(node)[1]:
                 u, node = self.convert_edge(u, node)
-                if self.contains_edge(u, node):
+                if self.contains_edge(u, node)[1]:
                     self.remove_edge(u, node)
 
         return True
@@ -114,32 +127,49 @@ class CRDTGraph:
 
     def find_path(self, source, target):
         # Breath-first search for the shortest path between u and v
-        q = [source]
-        head = 0
-        visited, trace = set(), dict()
-        trace[source] = source
 
-        while q.__len__() - head > 1:
-            u = q[head]
-            visited.add(u)
+        try:
+            q = [source]
+            head = 0
+            visited, trace = set(), dict()
+            trace[source] = source
 
-            if u == target:
-                break
+            while q.__len__() - head > 1:
+                u = q[head]
+                visited.add(u)
 
-            for v in self.get_neighbors(u):
-                if v in visited:
-                    continue
+                if u == target:
+                    break
 
-                trace[v] = u
-                q.append(v)
+                logger.debug(self.get_neighbors(u)[1])
+                for v in self.get_neighbors(u)[1]:
+                    if v in visited:
+                        continue
 
-        path = list()
-        while trace[target] != target:
-            path.append(target)
-            target = trace[target]
+                    trace[v] = u
+                    q.append(v)
 
-        path.append(source)
-        return path[:: - 1]
+            if target not in visited:
+                return False, []
+
+            path = list()
+            while trace[target] != target:
+                path.append(target)
+                target = trace[target]
+            path.append(source)
+            return True, path[:: - 1]
+        except Exception as e:
+            logger.exception(e)
+            return False, []
+
+    def clear(self):
+        try:
+            for node in self.list_nodes():
+                self.remove_vertex(node)
+            return True
+        except Exception as e:
+            logger.exception(e)
+            return False
 
     def broadcast(self):
         return {
