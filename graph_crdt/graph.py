@@ -38,7 +38,7 @@ class CRDTGraph:
         return neighbors
 
     def add_vertex(self, u):
-        self.vertices.add(u)
+        return self.vertices.add(u)
 
     def add_edge(self, u, v):
         # check if u and v exists

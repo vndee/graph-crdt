@@ -22,6 +22,10 @@ class DatabaseCluster:
     database_instance = CRDTGraph()
 
     @staticmethod
+    def execute(host: str = "0.0.0.0", port: int = 8000):
+        uvicorn.run(app=DatabaseCluster.communication_server, port=port, host=host)
+
+    @staticmethod
     @communication_server.get("/")
     async def status():
         return {
@@ -29,5 +33,16 @@ class DatabaseCluster:
         }
 
     @staticmethod
-    def execute(host: str = "0.0.0.0", port: int = 8000):
-        uvicorn.run(app=DatabaseCluster.communication_server, port=port, host=host)
+    @communication_server.get("/add_vertex/{u}")
+    async def add_vertex(u: int):
+        status = DatabaseCluster.database_instance.add_vertex(u)
+        if status is True:
+            return {
+                "status": "Success",
+                "message": f"Successfully added vertex {u}"
+            }
+        else:
+            return {
+                "status": "Error",
+                "message": f"An error occurred"
+            }
