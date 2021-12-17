@@ -1,3 +1,4 @@
+import json
 from .lww import LWWSet
 from .utils import get_logger
 
@@ -9,7 +10,18 @@ class CRDTGraph:
         self.vertices = LWWSet()
         self.edges = LWWSet()
         self.cluster_table = []
+        self.address_set = set()
         self.bidirection = bidirection
+
+    def get_cluster_table(self):
+        return self.cluster_table
+
+    def register_cluster_table(self, address):
+        if address not in self.address_set:
+            self.cluster_table.append(address)
+            self.address_set.add(address)
+
+        return True
 
     def convert_edge(self, u, v):
         if self.bidirection is True:
@@ -177,9 +189,15 @@ class CRDTGraph:
             return False
 
     def broadcast(self):
-        return {
-            "vertices.added": self.vertices.added,
-            "vertices.removed": self.vertices.removed,
-            "edges.added": self.edges.added,
-            "edges.removed": self.edges.removed
-        }
+        return json.dumps({
+            "vertices_added": self.vertices.added,
+            "vertices_removed": self.vertices.removed,
+            "edges_added": {f"{k[0]}_{k[1]}": v for k, v in self.edges.added.items()},
+            "edges_removed": {f"{k[0]}_{k[1]}": v for k, v in self.edges.removed.items()}
+        })
+
+    def merge(self, vertices_added, vertices_removed, edges_added, edges_removed):
+        vertices_added = json.loads(vertices_added)
+        vertices_removed = json.loads(vertices_removed)
+        edges_added = json.loads(edges_added)
+        edges_removed = json.loads(edges_removed)
