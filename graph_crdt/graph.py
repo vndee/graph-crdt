@@ -77,17 +77,17 @@ class CRDTGraph:
             removed_timestamp = self.vertices.removed[u]
 
         if added_timestamp is None:
-            return False
+            return True, False
 
         if removed_timestamp is None:
-            return True
+            return True, True
 
         if added_timestamp >= removed_timestamp:
             self.vertices.free_removed(u)
-            return True
+            return True, True
         else:
             self.vertices.free_added(u)
-            return False
+            return True, False
 
     def contains_edge(self, u, v):
         u, v = self.convert_edge(u, v)
@@ -100,17 +100,17 @@ class CRDTGraph:
             removed_timestamp = self.edges.removed[(u, v)]
 
         if added_timestamp is None:
-            return False
+            return True, False
 
         if removed_timestamp is None:
-            return True
+            return True, True
 
         if added_timestamp >= removed_timestamp:
             self.edges.free_removed((u, v))
-            return True
+            return True, True
         else:
             self.edges.free_added((u, v))
-            return False
+            return True, False
 
     def find_path(self, source, target):
         # Breath-first search for the shortest path between u and v
