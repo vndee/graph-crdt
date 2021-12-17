@@ -112,8 +112,34 @@ class CRDTGraph:
             self.edges.free_added((u, v))
             return False
 
-    def find_path(self, u, v):
-        pass
+    def find_path(self, source, target):
+        # Breath-first search for the shortest path between u and v
+        q = [source]
+        head = 0
+        visited, trace = set(), dict()
+        trace[source] = source
+
+        while q.__len__() - head > 1:
+            u = q[head]
+            visited.add(u)
+
+            if u == target:
+                break
+
+            for v in self.get_neighbors(u):
+                if v in visited:
+                    continue
+
+                trace[v] = u
+                q.append(v)
+
+        path = list()
+        while trace[target] != target:
+            path.append(target)
+            target = trace[target]
+
+        path.append(source)
+        return path[:: - 1]
 
     def merge(self):
         pass
