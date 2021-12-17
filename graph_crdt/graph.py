@@ -18,7 +18,7 @@ class CRDTGraph:
 
     def list_nodes(self):
         nodes = list()
-        for node in list(self.vertices.added_set):
+        for node in list(self.vertices.added.keys()):
             if self.contains_vertex(node):
                 nodes.append(node)
 
@@ -29,7 +29,7 @@ class CRDTGraph:
         if self.contains_vertex(u) is False:
             return neighbors
 
-        for node in list(self.vertices.added_set):
+        for node in list(self.vertices.added.keys()):
             if self.contains_vertex(node):
                 u, node = self.convert_edge(u, node)
                 if self.contains_edge(u, node):
@@ -56,7 +56,7 @@ class CRDTGraph:
         self.vertices.remove(u)
 
         # remove all connected edges of u
-        for node in list(self.vertices.added_set):
+        for node in list(self.vertices.added.keys()):
             if self.contains_vertex(node):
                 u, node = self.convert_edge(u, node)
                 if self.contains_edge(u, node):
@@ -70,11 +70,11 @@ class CRDTGraph:
 
     def contains_vertex(self, u):
         added_timestamp, removed_timestamp = None, None
-        if u in self.vertices.added_set:
-            added_timestamp = self.vertices.added_timestamp[u]
+        if u in self.vertices.added:
+            added_timestamp = self.vertices.added[u]
 
-        if u in self.vertices.removed_set:
-            removed_timestamp = self.vertices.removed_timestamp[u]
+        if u in self.vertices.removed:
+            removed_timestamp = self.vertices.removed[u]
 
         if added_timestamp is None:
             return False
@@ -93,11 +93,11 @@ class CRDTGraph:
         u, v = self.convert_edge(u, v)
         added_timestamp, removed_timestamp = None, None
 
-        if (u, v) in self.edges.added_set:
-            added_timestamp = self.edges.added_timestamp[(u, v)]
+        if (u, v) in self.edges.added:
+            added_timestamp = self.edges.added[(u, v)]
 
-        if (u, v) in self.edges.removed_set:
-            removed_timestamp = self.edges.removed_timestamp[(u, v)]
+        if (u, v) in self.edges.removed:
+            removed_timestamp = self.edges.removed[(u, v)]
 
         if added_timestamp is None:
             return False
@@ -141,5 +141,10 @@ class CRDTGraph:
         path.append(source)
         return path[:: - 1]
 
-    def merge(self):
-        pass
+    def broadcast(self):
+        return {
+            "vertices.added": self.vertices.added,
+            "vertices.removed": self.vertices.removed,
+            "edges.added": self.edges.added,
+            "edges.removed": self.edges.removed
+        }
