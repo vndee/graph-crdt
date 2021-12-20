@@ -13,6 +13,9 @@ class CRDTGraph:
         self.address_set = set()
         self.bidirection = bidirection
 
+    def set_dir(self, dir):
+        self.bidirection = dir
+
     def get_cluster_table(self):
         return self.cluster_table
 
@@ -20,8 +23,9 @@ class CRDTGraph:
         if address not in self.address_set:
             self.cluster_table.append(address)
             self.address_set.add(address)
+            return True
 
-        return True
+        return False
 
     def convert_edge(self, u, v):
         if self.bidirection is True:
@@ -69,7 +73,7 @@ class CRDTGraph:
     def add_edge(self, u, v):
         # check if u and v exists
         if self.contains_vertex(u)[1] is False or self.contains_vertex(v)[1] is False:
-            return False, "Not valid vertex"
+            return False, f"Not valid vertex ({u} - {v})"
 
         if self.contains_edge(u, v)[1]:
             return False, "Duplicated"
@@ -189,15 +193,56 @@ class CRDTGraph:
             return False
 
     def broadcast(self):
-        return json.dumps({
-            "vertices_added": self.vertices.added,
-            "vertices_removed": self.vertices.removed,
-            "edges_added": {f"{k[0]}_{k[1]}": v for k, v in self.edges.added.items()},
-            "edges_removed": {f"{k[0]}_{k[1]}": v for k, v in self.edges.removed.items()}
-        })
+        return {
+            "vertices_added": json.dumps(self.vertices.added),
+            "vertices_removed": json.dumps(self.vertices.removed),
+            "edges_added": json.dumps({f"{k[0]}_{k[1]}": v for k, v in self.edges.added.items()}),
+            "edges_removed": json.dumps({f"{k[0]}_{k[1]}": v for k, v in self.edges.removed.items()})
+        }
+        # return {
+        #     "vertices_added": self.vertices.added,
+        #     "vertices_removed": self.vertices.removed,
+        #     "edges_added": self.edges.added,
+        #     "edges_removed": self.edges.removed
+        # }
 
     def merge(self, vertices_added, vertices_removed, edges_added, edges_removed):
         vertices_added = json.loads(vertices_added)
         vertices_removed = json.loads(vertices_removed)
         edges_added = json.loads(edges_added)
         edges_removed = json.loads(edges_removed)
+
+        for k, v in vertices_added.items():
+            if k in database_instance.vertices.added:
+                if database_instance.vertices.added[k] >= v:
+                    continue
+            database_instance.vertices.added[k] = v
+
+        for k, v in vertices_removed:
+            if k in database_instance.vertices.removed:
+                if database_instance.vertices.removed[k] >= v:
+                    continue
+            database_instance.vertices.removed[k] = v
+
+        for k, z in edges_added.items():
+            u, v = int(k.split("_")[0]), int(k.split("_")[1])
+            u, v = database_instance.convert_edge(u, v)
+
+            if (u, v) in database_instance.edges.added:
+                if database_instance.edges.added[(u, v)] >= z:
+                    continue
+
+            database_instance.edges.added[(u, v)] = z
+
+        for k, z in edges_removed.items():
+            u, v = int(k.split("_")[0]), int(k.split("_")[1])
+            u, v = database_instance.convert_edge(u, v)
+
+            if (u, v) in database_instance.edges.removed:
+                if database_instance.edges.removed[(u, v)] >= z:
+                    continue
+
+            database_instance.edges.removed[(u, v)] = z
+
+
+database_instance = CRDTGraph()
