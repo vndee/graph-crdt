@@ -199,12 +199,6 @@ class CRDTGraph:
             "edges_added": json.dumps({f"{k[0]}_{k[1]}": v for k, v in self.edges.added.items()}),
             "edges_removed": json.dumps({f"{k[0]}_{k[1]}": v for k, v in self.edges.removed.items()})
         }
-        # return {
-        #     "vertices_added": self.vertices.added,
-        #     "vertices_removed": self.vertices.removed,
-        #     "edges_added": self.edges.added,
-        #     "edges_removed": self.edges.removed
-        # }
 
     def merge(self, vertices_added, vertices_removed, edges_added, edges_removed):
         vertices_added = json.loads(vertices_added)
@@ -212,37 +206,44 @@ class CRDTGraph:
         edges_added = json.loads(edges_added)
         edges_removed = json.loads(edges_removed)
 
+        print(vertices_added)
+        print(vertices_removed)
+        print(edges_added)
+        print(edges_removed)
+
         for k, v in vertices_added.items():
-            if k in database_instance.vertices.added:
-                if database_instance.vertices.added[k] >= v:
+            k = int(k)
+            if k in self.vertices.added:
+                if self.vertices.added[k] >= v:
                     continue
-            database_instance.vertices.added[k] = v
+            self.vertices.added[k] = v
 
         for k, v in vertices_removed:
-            if k in database_instance.vertices.removed:
-                if database_instance.vertices.removed[k] >= v:
+            k = int(k)
+            if k in self.vertices.removed:
+                if self.vertices.removed[k] >= v:
                     continue
-            database_instance.vertices.removed[k] = v
+            self.vertices.removed[k] = v
 
         for k, z in edges_added.items():
             u, v = int(k.split("_")[0]), int(k.split("_")[1])
-            u, v = database_instance.convert_edge(u, v)
+            u, v = self.convert_edge(u, v)
 
-            if (u, v) in database_instance.edges.added:
-                if database_instance.edges.added[(u, v)] >= z:
+            if (u, v) in self.edges.added:
+                if self.edges.added[(u, v)] >= z:
                     continue
 
-            database_instance.edges.added[(u, v)] = z
+            self.edges.added[(u, v)] = z
 
         for k, z in edges_removed.items():
             u, v = int(k.split("_")[0]), int(k.split("_")[1])
-            u, v = database_instance.convert_edge(u, v)
+            u, v = self.convert_edge(u, v)
 
-            if (u, v) in database_instance.edges.removed:
-                if database_instance.edges.removed[(u, v)] >= z:
+            if (u, v) in self.edges.removed:
+                if self.edges.removed[(u, v)] >= z:
                     continue
 
-            database_instance.edges.removed[(u, v)] = z
+            self.edges.removed[(u, v)] = z
 
 
 database_instance = CRDTGraph()

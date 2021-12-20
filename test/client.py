@@ -74,6 +74,8 @@ class CRDTGraphClientTestCase(unittest.TestCase):
         self.assertEqual(instance.add_edge(1, 3)["status"], "Success")
         self.assertEqual(instance.find_path(2, 3)["data"], [2, 1, 3])
         self.assertEqual(instance.get_neighbors(1), [2, 3])
+        self.assertEqual(instance.add_vertex(4)["status"], "Success")
+        self.assertEqual(instance.find_path(1, 4)["status"], "Error")
 
 
 if __name__ == "__main__":

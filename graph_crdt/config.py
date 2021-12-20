@@ -1,3 +1,3 @@
 class Config:
-    BROADCASTER = ("127.0.0.1", 20003)
+    REQUEST_TIMEOUT = 3
     BUFFER_SIZE = 2048
