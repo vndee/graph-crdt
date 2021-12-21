@@ -145,3 +145,20 @@ instance.broadcast()
 
 print(instance.get_neighbors(1)) # [2, 3] the returned result is on the sorted order
 ```
+
+### Testing
+
+This project is also providing some pre-defined tests to validate our system. For example, to test the functionalities of a database instance, start an instance with the listing port `8081` first.```bash
+docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 -e FRIEND_ADDRESS=-1 gcrdt
+```
+Then run the unit test as below:
+```bash
+python -m unittest test/unit.py
+```
+If you want to check the consistency between replicas, we start 5 instances first and then run another test as below:
+```bash
+./run.sh
+
+python -m unittest test/integration.py
+```
+
