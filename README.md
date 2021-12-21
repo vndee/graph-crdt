@@ -168,4 +168,4 @@ python -m unittest test/integration.py
 
 - Back up data on disk to preserve the data even when all database instances is crashed.
 - Add authentication and authorization layer to the gateway.
-- Reduce network latency and broadcasting operation. We can develop a smarter routing algorithm to reduce the number of broadcasting operations. Our main objective is to minimize the longest path between any replica in the network, but we also don't want too many connections in the network. That is why we need a "smart" routing algorithm.
+- Reduce network latency and broadcasting operations. We can develop a smarter routing algorithm to reduce the number of broadcasting operations. Our main objective is to minimize the longest path between any replica in the network, but we also don't want to keep too many connections (edge) in the network. That is why we need a "smart" routing algorithm.
