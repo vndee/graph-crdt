@@ -29,16 +29,19 @@ docker build -t gcrdt .
 
 Run the first database instance. It should be noted that the first instance of the network has no friend here, so we set `FRIEND_ADDRESS=-1`:
 ```bash
-docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 -e FRIEND_ADDRESS=-1 gcrdt
+docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 \
+			-e FRIEND_ADDRESS=-1 gcrdt
 ```
 Due to the limitations of Docker for MacOS (https://docs.docker.com/desktop/mac/networking/), we should use `http://host.docker.internal` as the hostname. In Linux, we can use `http://127.0.0.1` of `http://localhost` instead.
  
 From the second instance (replica), if we want it to be connected to the first instance's network, we must set the `FRIEND_ADDRESS` variable as the address of the instance already in the network. For example:
 
 ```bash
-docker run -d --name cluster_2 -p 8082:8000 -e ADDRESS=http://host.docker.internal:8082 -e FRIEND_ADDRESS=http://host.docker.internal:8081 gcrdt
+docker run -d --name cluster_2 -p 8082:8000 -e ADDRESS=http://host.docker.internal:8082 \
+			-e FRIEND_ADDRESS=http://host.docker.internal:8081 gcrdt
 
-docker run -d --name cluster_3 -p 8083:8000 -e ADDRESS=http://host.docker.internal:8083 -e FRIEND_ADDRESS=http://host.docker.internal:8082 gcrdt
+docker run -d --name cluster_3 -p 8083:8000 -e ADDRESS=http://host.docker.internal:8083 \
+			-e FRIEND_ADDRESS=http://host.docker.internal:8082 gcrdt
 ```
 
 After executing these commands, **cluster_1**, **cluster_3**, **cluster_3** are connected. We can also run the sample script to have a network with 5 replicas (instances):
@@ -152,7 +155,8 @@ print(instance.get_neighbors(1)) # [2, 3] the returned result is on the sorted o
 
 This project is also provided some pre-defined tests to validate our system. For example, to test the functionalities of a database instance, start an instance with the listing port `8081` first.
 ```bash
-docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 -e FRIEND_ADDRESS=-1 gcrdt
+docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 \
+			-e FRIEND_ADDRESS=-1 gcrdt
 ```
 Then run the unit test as below:
 ```bash
