@@ -59,7 +59,7 @@ class CRDTGraph:
                     if self.contains_edge(u, node)[1]:
                         neighbors.append(_node)
 
-            return True, neighbors
+            return True, sorted(neighbors)
         except Exception as e:
             logger.exception(e)
             return False, []
@@ -218,7 +218,7 @@ class CRDTGraph:
                     continue
             self.vertices.added[k] = v
 
-        for k, v in vertices_removed:
+        for k, v in vertices_removed.items():
             k = int(k)
             if k in self.vertices.removed:
                 if self.vertices.removed[k] >= v:

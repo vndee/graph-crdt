@@ -38,6 +38,7 @@ class DatabaseWorker:
 
                 friends = message["friend_list"]
                 logger.info(friends)
+                logger.debug(message)
                 for friend in friends:
                     if friend == message["your_address"] or friend == message["from_addr"]:
                         continue
@@ -51,10 +52,14 @@ class DatabaseWorker:
                         "edges_removed": message["edges_removed"]
                     }
 
-                    logger.debug(f"Broadcasting merge request to {friend}")
-                    response = requests.post(f"{friend}/merge", data=data, timeout=Config.REQUEST_TIMEOUT)
-                    logger.info(f"Broadcasted merge request to {friend}: {response.json()}")
-
+                    uuid = message["uuid"]
+                    try:
+                        logger.debug(f"Broadcasting merge request to {friend} with uuid: {uuid}")
+                        response = requests.post(f"{friend}/merge", data=data, timeout=Config.REQUEST_TIMEOUT)
+                        logger.info(f"Broadcasted merge request to {friend}: {response.json()}")
+                    except Exception as e:
+                        logger.exception(e)
+                        logger.info(f"Request timeout {friend}/merge with uuid: {uuid}")
                 logger.info("Successfully merged!")
             elif message["query"] == "set_dir":
                 database_instance.set_dir(bool(message["dir"]))
@@ -69,11 +74,20 @@ class DatabaseWorker:
                 data["from_addr"] = message["from_addr"]
 
                 friend = message["to"]
-                response = requests.post(f"{friend}/merge", data=data, timeout=Config.REQUEST_TIMEOUT)
+                try:
+                    response = requests.post(f"{friend}/merge", data=data, timeout=Config.REQUEST_TIMEOUT)
 
-                res = {
-                    "status": response.json()["status"]
-                }
+                    res = {
+                        "status": response.json()["status"]
+                    }
+                except Exception as e:
+                    logger.exception(e)
+                    uuid = message["uuid"]
+                    logger.info(f"Request timeout {friend}/merge with uuid {uuid}")
+                    res = {
+                        "status": "Error"
+                    }
+
                 self.response(res, address)
                 logger.info("Broadcasted")
             elif message["query"] == "add_vertex":
@@ -185,11 +199,15 @@ class DatabaseWorker:
             elif message["query"] == "register":
                 addr = message["to"]
                 self.response({"data": "Success"}, address)
-                response = requests.post(f"{addr}/register",
-                                         data={"their_address": message["data"],
-                                               "my_address": message["from"]},
-                                         timeout=Config.REQUEST_TIMEOUT)
-                response = response.json()["status"]
+                try:
+                    response = requests.post(f"{addr}/register",
+                                             data={"their_address": message["data"],
+                                                   "my_address": message["from"]},
+                                             timeout=Config.REQUEST_TIMEOUT)
+                    response = response.json()["status"]
+                except Exception as e:
+                    logger.exception(e)
+                    logger.info(f"Request timeout {addr}/register")
 
                 f, t, d = message["from"], message["to"], message["data"]
                 logger.info(f"Broadcasted from {f} to {t} with {d}: {response}")

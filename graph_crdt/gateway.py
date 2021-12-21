@@ -44,6 +44,11 @@ class DatabaseGateway:
 
     @staticmethod
     def send_socket(data):
+        """
+        Send message from REST gateway to UDP socket worker
+        :param data: message content as dictionary
+        :return: received message from UDP socket worker
+        """
         msg = json.dumps(data)
         msg = str.encode(msg)
         DatabaseGateway.UDPClientSocket.sendto(msg, DatabaseGateway.socket_internal)
@@ -52,6 +57,11 @@ class DatabaseGateway:
 
     @staticmethod
     def register_cluster_table(address):
+        """
+        Add newcomer address to friend list
+        :param address:
+        :return:
+        """
         if address not in DatabaseGateway.address_set:
             DatabaseGateway.cluster_table.append(address)
             DatabaseGateway.address_set.add(address)
@@ -62,6 +72,10 @@ class DatabaseGateway:
     @staticmethod
     @communication_server.on_event("startup")
     async def startup_event():
+        """
+        REST gateway startup event
+        :return:
+        """
         data = {
             "query": "set_dir",
             "dir": DatabaseGateway.bidirection
@@ -73,8 +87,8 @@ class DatabaseGateway:
         logger.info(f"Socket tunnel listening at {DatabaseGateway.socket_internal}")
 
         if DatabaseGateway.friend_address is not None:
+            # let friend know we are connected to the network
             _ = DatabaseGateway.register_cluster_table(DatabaseGateway.friend_address)
-
             response = requests.post(f"{DatabaseGateway.friend_address}/register",
                                      data={"their_address": DatabaseGateway.your_address,
                                            "my_address": DatabaseGateway.your_address})
@@ -85,6 +99,16 @@ class DatabaseGateway:
     @staticmethod
     def execute(host: str = "0.0.0.0", port: int = 8000, your_address=None, friend_address=None, bidirection=True,
                 socket_internal=None):
+        """
+        Execute REST gateway
+        :param host:
+        :param port:
+        :param your_address:
+        :param friend_address:
+        :param bidirection:
+        :param socket_internal:
+        :return:
+        """
         DatabaseGateway.bidirection = bidirection
         DatabaseGateway.your_address = your_address
         DatabaseGateway.friend_address = friend_address
@@ -124,11 +148,18 @@ class DatabaseGateway:
     @communication_server.post("/register/")
     async def register(their_address: str = Form(...),
                        my_address: str = Form(...)):
+        """
+        Listening for a friend who are new in the network to help them connect to the network
+        :param their_address:
+        :param my_address:
+        :return:
+        """
         f = DatabaseGateway.register_cluster_table(their_address)
         if f is False:
             return DatabaseGateway.response("Success", "Cluster address has already been registered!")
 
         for addr in DatabaseGateway.cluster_table:
+            # let other friends knows our new friend has just connected
             if addr != their_address and addr != my_address:
                 logger.info(f"Broadcasting newcomer {their_address} to {addr}")
 
@@ -142,7 +173,7 @@ class DatabaseGateway:
                 rcv_msg = DatabaseGateway.send_socket(data)
                 logger.info(f"Received message: {rcv_msg}")
 
-        logger.info("Successfully registered and broadcasted")
+        logger.info(f"Successfully registered and broadcasted: {their_address}")
         return DatabaseGateway.response("Success", "Successfully register cluster address")
 
     @staticmethod
@@ -271,13 +302,16 @@ class DatabaseGateway:
     @staticmethod
     @communication_server.get("/broadcast")
     async def broadcast():
+        uid = str(uuid.uuid4())
         data = {
             "query": "broadcast",
-            "uuid": str(uuid.uuid4()),
+            "uuid": uid,
             "from_addr": DatabaseGateway.your_address
         }
+        DatabaseGateway.merged_uuid.add(data["uuid"])
 
         for friend in DatabaseGateway.cluster_table:
+            # send to other friend new updates
             data["to"] = friend
             rcv_msg = DatabaseGateway.send_socket(data)
             rcv_msg = DatabaseGateway.decode(rcv_msg[0])["status"]
@@ -285,7 +319,7 @@ class DatabaseGateway:
             logger.info(f"Broadcasted merge request to {friend}: {rcv_msg}")
 
         return DatabaseGateway.response("Success", data=data,
-                                        success_msg="Successfully broadcast")
+                                        success_msg=f"Successfully broadcast with uuid: {uid}")
 
     @staticmethod
     @communication_server.get("/get_friend")

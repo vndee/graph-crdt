@@ -43,3 +43,7 @@ class CRDTGraphClient:
     def clear(self):
         response = requests.get(f"{self.host}/clear")
         return response.json()["data"]
+
+    def broadcast(self):
+        response = requests.get(f"{self.host}/broadcast")
+        return response.json()["status"]

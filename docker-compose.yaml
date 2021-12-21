@@ -1,3 +1,31 @@
 version: '2.3'
 
 services:
+  cluster_1:
+    build: .
+    environment:
+      ADDRESS: http://127.0.0.1:8081
+      FRIEND_ADDRESS: "-1"
+    ports:
+      - 8081:8000
+    networks:
+      gcrdt:
+        aliases:
+          - cluster-1
+  cluster_2:
+    depends_on:
+      - cluster_1
+    build: .
+    environment:
+      ADDRESS: http://127.0.0.1:8082
+      FRIEND_ADDRESS: http://127.0.0.1:8081
+    ports:
+      - 8082:8000
+    networks:
+      gcrdt:
+        aliases:
+          - cluster-2
+
+networks:
+  gcrdt:
+    driver: bridge
