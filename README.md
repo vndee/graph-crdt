@@ -113,7 +113,3 @@ instance.broadcast()
 
 print(instance.exists_edge(1, 2)) # False
 ```
-
-```bash 
-./run.sh
-```
