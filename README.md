@@ -40,7 +40,7 @@ docker run -d --name cluster_2 -p 8082:8000 -e ADDRESS=http://host.docker.intern
 docker run -d --name cluster_3 -p 8083:8000 -e ADDRESS=http://host.docker.internal:8083 -e FRIEND_ADDRESS=http://host.docker.internal:8082 gcrdt
 ```
 
-After executing these commands, **cluster_1**, **cluster_3**, **cluster_3** are connected. We can also run the sample script to have a network with 5 replicas (instance):
+After executing these commands, **cluster_1**, **cluster_3**, **cluster_3** are connected. We can also run the sample script to have a network with 5 replicas (instances):
 ```bash
 chmod +x run.sh
 ./run.sh
