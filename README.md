@@ -14,13 +14,17 @@ This project comes with a full decentralization fashion which can merge data wit
 
 ### Installation
 
+Requirements:
+
+- Docker version 20.10.6 
+
 Build docker image for the database instance:
 
 ```bash
 docker build -t gcrdt .
 ```
 
-Run the first database instance, it should be noted that the first instance of the network has no friend here, so we set `FRIEND_ADDRESS=-1`:
+Run the first database instance. It should be noted that the first instance of the network has no friend here, so we set `FRIEND_ADDRESS=-1`:
 ```bash
 docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 -e FRIEND_ADDRESS=-1 gcrdt
 ```
