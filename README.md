@@ -8,7 +8,8 @@ This project is a simple implementation of a conflict-free replicated graph data
 - check if a vertex/edge is in the graph
 - query all vertices connected to a vertex
 - find any path between two vertices
-- merge with concurrent changes from other graphs/replicas.
+- merge with concurrent changes from other graphs/replicas
+
 This project comes with a full decentralization fashion which can merge data without any coordination between replicas. The core idea of this project is that each replica can work independently. When the replica connects to the database network, they can merge or receive updates from other replicas via the connection in the network. When a replica starts, it should be assigned an address and know exactly one friend (replica) in the network. After a replica in the network receives a message that its friend has just registered to the network, it will broadcast information of this newcomer to the whole network. This message will be to all replicas via the connection between replicas since the network is always connected. Likewise, when a replica sends a merge request to its friends, this message will also be sent to all other replicas. The Last-Writer-Wins data type will solve any conflict.
 
 ### Installation
