@@ -3,7 +3,7 @@
 ***A portable on-memory conflict-free replicated graph database.***
 
 
-This project is a simple implementation of a conflict-free replicated graph database. The graph operations have been developed based on the Last-Writer-Wins element set, which contains several essential functions as follow:
+This is a simple implementation of a conflict-free replicated graph database. The graph operations have been developed based on the Last-Writer-Wins element set, which contains several essential functions as follow:
 - add a vertex/edge
 - remove a vertex/edge
 - check if a vertex/edge is in the graph
