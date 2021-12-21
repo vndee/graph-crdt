@@ -181,7 +181,7 @@ class CRDTGraphIntegrationTestCase(unittest.TestCase):
     cluster_4 = "http://127.0.0.1:8084"
     cluster_5 = "http://127.0.0.1:8085"
     
- 	def test_get_neighbors_and_find_paths(self):
+    def test_get_neighbors_and_find_paths(self):
         instance_1 = CRDTGraphClient(CRDTGraphIntegrationTestCase.cluster_1)
         instance_2 = CRDTGraphClient(CRDTGraphIntegrationTestCase.cluster_2)
         instance_3 = CRDTGraphClient(CRDTGraphIntegrationTestCase.cluster_3)
