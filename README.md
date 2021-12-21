@@ -1,6 +1,6 @@
 ## GraphCRDT
 
-***A portable on-memory conflict-free replicated graph database.***
+*A portable on-memory conflict-free replicated graph database.*
 
 
 This is a simple implementation of a conflict-free replicated graph database. The graph operations have been developed based on the Last-Writer-Wins element set, which contains several essential functions as follow:
