@@ -73,7 +73,7 @@ There are several ways to deal with this problem:
 
 
 
-### API Client:
+### API Client
 
 Simply install the API client of this project in Python (a PyPi version will come soon):
 ```bash
