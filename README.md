@@ -82,7 +82,7 @@ instance.clear() # clear all edges and vertices from the database
 instance.broadcast() # send new update to the network
 ```
 
-- Add and remove a vertex:
+- Add/remove/check a vertex:
 ```python
 instance.add_vertex(1)
 instance.add_vertex(2)
@@ -99,7 +99,20 @@ print(instance.exists_vertex(1)) # False
 print(instance.exists_vertex(2)) # False
 ```
 
-- Add and remove
+- Add/remove/check an edge:
+```python
+instance.add_vertex(1)
+instance.add_vertex(2)
+instance.add_edge(1, 2)
+instance.broadcast()
+
+print(instance.exists_edge(1, 2)) # True
+
+instance.remove_edge(1)
+instance.broadcast()
+
+print(instance.exists_edge(1, 2)) # False
+```
 
 ```bash 
 ./run.sh
