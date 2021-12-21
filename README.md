@@ -1,4 +1,4 @@
-# graph-crdt
+### graph-crdt
 A conflict-free replicated database
 
 ```bash
