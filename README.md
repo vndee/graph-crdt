@@ -51,7 +51,7 @@ There are serveral ways to deal with this problem:
 
 - Use TTL or Timeout for a request: This is not a good idea, since TTL/Timeout will increase the latecy of the whole network.
 - Use fire-and-forget protocols like Apache Thrift, UDPSocket: The main drawback of these protocols is we must keep the connection between 2 services if we want it can talk to each other. It will be another problem about network connection in a large network.
-- Seperate architecture into 2 layers: Yes, atleast it is suitable for our case. We can use 2 layers, the first one for communication among network, another one is responsible for performing logic query and broadcasting among replicas. These 2 layers is communicated via exactly one UDPSocket tunnel inner container, this will more stable than we must hold a bunch of connection in the second option.
+- Seperate architecture into 2 layers: Yes, atleast it is suitable for our case. We can use 2 layers, the first one for communication among network, another one is responsible for performing logic query and broadcasting among replicas. These 2 layers is communicated via exactly one UDPSocket tunnel inner container, this will more stable than we must hold a bunch of connection in the second option. Since each request will be immediately response by the gateway, other job will be performed by worker so we can imagine this as a fire-and-forget gateway.
 
 <p align="center">
   <img src="https://i.imgur.com/F0FxMu8.png" />
