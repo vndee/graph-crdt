@@ -82,7 +82,6 @@ from gcrdt_client import CRDTGraphClient
 connection_string = "http://127.0.0.1:8081"
 instance = CRDTGraphClient(connection_string)
 ```
-
 - Clear database. A `broadcast()` request should be sent after any operation in the database instances to keep the data real-time synchronized among replicas. Although, of course, we can also send `broadcast()` request after a list of operations in the database, the rule of Last-Writer-Wins will solve any conflicts:
 ```python
 instance.clear() # clear all edges and vertices from the database
@@ -164,3 +163,8 @@ If you want to check the consistency between replicas, we start 5 instances firs
 python -m unittest test/integration.py
 ```
 
+### Improvement directions
+
+- Back up data on disk to preserve the data even when all database instances is crashed.
+- Add authentication and authorization layer to the gateway.
+- Reduce network latency and broadcasting operation. We can develop a smarter routing algorithm to reduce the number of broadcasting operations. Our main objective is to minimize the longest path between any replica in the network, but we also don't want too many connections in the network. That is why we need a "smart" routing algorithm.
