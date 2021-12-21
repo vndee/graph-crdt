@@ -40,7 +40,7 @@ chmod +x run.sh
 ./run.sh
 ```
 
-### Challenges
+### Architecture
 
 In this type of peer-to-peer communication, latency and switching loop (https://en.wikipedia.org/wiki/Switching_loop) is a big problem. As the figure below, when D connected to the network, D let its friend B know that he is connected and B will send to its friend A about the information. Now A will send the information to its friend C, and C is also a friend of B. So that the switching loop problem arised. In any stateful communication type like REST, when a service send a request, it will wait for a response that why switching loop happend.
 There are serveral ways to deal with this problem:
@@ -51,6 +51,7 @@ There are serveral ways to deal with this problem:
 
 - Use TTL or Timeout for a request: This is not a good idea, since TTL/Timeout will increase the latecy of the whole network.
 - Use fire-and-forget protocols like Apache Thrift, UDPSocket: The main drawback of these protocols is we must keep the connection between 2 services if we want it can talk to each other. It will be another problem about network connection in a large network.
+- Use asynchornous message queue like RabbitMQ, Kafka: We can do that, but unfortunately we don't want any cordination between services and our network must be fully decentralized among replicas, it means any centralized data will not be accepted.
 - Seperate architecture into 2 layers: Yes, atleast it is suitable for our case. We can use 2 layers, the first one for communication among network, another one is responsible for performing logic query and broadcasting among replicas. These 2 layers is communicated via exactly one UDPSocket tunnel inner container, this will more stable than we must hold a bunch of connection in the second option. Since each request will be immediately response by the gateway, other job will be performed by worker so we can imagine this as a fire-and-forget gateway.
 
 <p align="center">
@@ -58,9 +59,27 @@ There are serveral ways to deal with this problem:
 </p>
 
 
-Client:
+### API Client:
+
+Simply install the API client of this project in Python using:
 ```bash
 python setup.py install
+```
+
+Usage:
+
+- Connect to a database instance:
+```python
+from gcrdt_client import CRDTGraphClient
+
+connection_string = "http://127.0.0.1:8081"
+instance = CRDTGraphClient(connection_string)
+```
+
+- Clear database. It should be noted that a `broadcast()` request should be sent after any operation in the database intances to keep the data real-time synchornized among replicas. Ofcourse, we can also send `broadcast()` request after a set of operations in the database, any conlficts will be solve by the rule of Last-Writer-Wins:
+```python
+instance.clear() # clear all edges and vertices from the database
+instance.broadcast() # send new update to the network
 ```
 
 
