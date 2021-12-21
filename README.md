@@ -153,6 +153,8 @@ instance.broadcast()
 print(instance.get_neighbors(1)) # [2, 3] the returned result is on the sorted order
 ```
 
+Apart from the client API in Python, we can also directly use REST API of the instance gateway to perform queries. Check it out at `{host_name}:{port}/redoc` or `{host_name}/{port}/docs` (For example: http://127.0.0.1:8081/redoc or http://127.0.0.1:8081/docs)
+
 ### Testing
 
 This project is also provided some pre-defined tests to validate our system. For example, to test the functionalities of a database instance, start an instance with the listing port `8081` first.
