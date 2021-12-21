@@ -17,6 +17,7 @@ This project comes with a full decentralization fashion which can merge data wit
 Requirements:
 
 - Docker version 20.10.6+ 
+- Python 3.8+
 
 Build docker image for the database instance:
 
