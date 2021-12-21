@@ -113,3 +113,29 @@ instance.broadcast()
 
 print(instance.exists_edge(1, 2)) # False
 ```
+
+- Find path between two vertices:
+```python
+instance.add_vertex(1)
+instance.add_vertex(2)
+instance.add_vertex(3)
+instance.add_edge(1, 2)
+instance.broadcast()
+
+print(instance.find_path(1, 2)) # [1, 2]
+
+instance.add_edge(1, 3)
+print(instance.find_path(2, 3)) # [2, 1, 3]
+```
+
+- Query for all vertices connected to a vertex:
+```python
+instance.add_vertex(1)
+instance.add_vertex(2)
+instance.add_vertex(3)
+instance.add_edge(1, 2)
+instance.add_edge(1, 3)
+instance.broadcast()
+
+print(instance.get_neighbors(1)) # [2, 3] the returned result is on the sorted order
+```
