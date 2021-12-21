@@ -32,9 +32,11 @@ Run the first database instance. It should be noted that the first instance of t
 docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 \
 			-e FRIEND_ADDRESS=-1 gcrdt
 ```
-Due to the limitations of Docker for MacOS (https://docs.docker.com/desktop/mac/networking/), we should use `http://host.docker.internal` as the hostname. In Linux, we can use `http://127.0.0.1` of `http://localhost` instead.
+Due to the limitations of Docker for MacOS (https://docs.docker.com/desktop/mac/networking/), we should use `http://host.docker.internal` as the hostname. In Linux systems, we can use `http://127.0.0.1` of `http://localhost` instead.
  
-From the second instance (replica), if we want it to be connected to the first instance's network, we must set the `FRIEND_ADDRESS` variable as the address of the instance already in the network. For example:
+From the second instance (replica), if we want it to be connected to the first instance's network, we must set the `FRIEND_ADDRESS` variable as the address of the instance already in the network. 
+
+For example:
 
 ```bash
 docker run -d --name cluster_2 -p 8082:8000 -e ADDRESS=http://host.docker.internal:8082 \
@@ -44,7 +46,7 @@ docker run -d --name cluster_3 -p 8083:8000 -e ADDRESS=http://host.docker.intern
 			-e FRIEND_ADDRESS=http://host.docker.internal:8082 gcrdt
 ```
 
-After executing these commands, **cluster_1**, **cluster_3**, **cluster_3** are connected. We can also run the sample script to have a network with 5 replicas (instances):
+After executing these commands, **cluster_1**, **cluster_3**, **cluster_3** are connected. We can also run the sample script (provided in the project repository) to have a network with 5 replicas (instances):
 ```bash
 chmod +x run.sh
 ./run.sh
@@ -53,7 +55,7 @@ chmod +x run.sh
 ### Architecture
 
 
-In this type of peer-to-peer communication, latency and switching loop (https://en.wikipedia.org/wiki/Switching_loop) is a big problem. As the figure below shows, D lets its friend B know that he wants to join when D connects to the network. Then B will send to its friend A the information of D. Likewise, A will send the information to its friend C, and C is also a friend of B, so that C will send another request to B. In any REST-like communication type, when a service sends a request, it will wait for a response. That is why the switching loop problem arises here: B wait for A to respond, A wait for C, and C is also waiting for B.
+In this type of peer-to-peer communication, latency and switching loop (https://en.wikipedia.org/wiki/Switching_loop) is the big problems. As the figure below shows, D lets its friend B know that he wants to join when D connects to the network. Then B will send to its friend A the information of D. Likewise, A will send the information to its friend C, and C is also a friend of B, so that C will send another request to B. In any REST-like communication type, when a service sends a request, it will wait for a response. That is why the switching loop problem arises here: B wait for A to respond, A wait for C, and C is also waiting for B.
 <p align="center">
   <img src="https://i.imgur.com/brmnztR.png" />
 </p>
