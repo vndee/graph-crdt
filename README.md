@@ -22,7 +22,22 @@ docker build -t gcrdt .
 
 Run the first database instance, it should be noted that the first instance of the network has no friend here, so we set `FRIEND_ADDRESS=-1`:
 ```bash
+docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 -e FRIEND_ADDRESS=-1 gcrdt
+```
+Due to the limitations of Docker for MacOS (https://docs.docker.com/desktop/mac/networking/), we should use `http://host.docker.internal` as the host name, in the other platform like linux we can use `http://127.0.0.1` of `http://localhost` instead.
+ 
+From the second instance (replica), if we want it connected to the network of the first instance, we must set `FRIEND_ADDRESS` variable as the address of the instance which is already in the network. For example:
 
+```bash
+docker run -d --name cluster_2 -p 8082:8000 -e ADDRESS=http://host.docker.internal:8082 -e FRIEND_ADDRESS=http://host.docker.internal:8081 gcrdt
+
+docker run -d --name cluster_3 -p 8083:8000 -e ADDRESS=http://host.docker.internal:8083 -e FRIEND_ADDRESS=http://host.docker.internal:8082 gcrdt
+```
+
+After these commaned are executed, cluster_1, cluster_3, cluster_3 is conntected together. We can also run the sample script to have a network with 5 replicas (instance):
+```bash
+chmod +x run.sh
+./run.sh
 ```
 
 ![](https://i.imgur.com/brmnztR.png)
