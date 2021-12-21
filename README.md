@@ -157,7 +157,7 @@ Then run the unit test as below:
 ```bash
 python -m unittest test/unit.py
 ```
-If you want to check the consistency between replicas, we start 5 instances first and then run another test as below:
+If you want to check the consistency between replicas, we start 5 instances and then run another test as below:
 ```bash
 ./run.sh # to start 5 database instances
 
