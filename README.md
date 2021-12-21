@@ -108,7 +108,7 @@ instance.broadcast()
 
 print(instance.exists_edge(1, 2)) # True
 
-instance.remove_edge(1)
+instance.remove_edge(1, 2)
 instance.broadcast()
 
 print(instance.exists_edge(1, 2)) # False
