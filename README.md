@@ -1,4 +1,5 @@
-## graph-crdt
+## GraphCRDT
+
 A portable on-memory conflict-free replicated graph database.
 
 
