@@ -174,6 +174,9 @@ python -m unittest test/integration.py
 Sample testcase:
 ```python
 
+import unittest
+from gcrdt_client import CRDTGraphClient
+
 class CRDTGraphIntegrationTestCase(unittest.TestCase):
     cluster_1 = "http://127.0.0.1:8081"
     cluster_2 = "http://127.0.0.1:8082"
