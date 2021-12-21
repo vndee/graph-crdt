@@ -18,3 +18,7 @@ jobs:
       run: docker build -t gcrdt .
     - name: Run docker container
       run: ./run.sh
+    - name: Run unit test
+      run: python3 -m unittest test/unit.py
+    - name: Run integration test
+      run: python3 -m unittest test/integration.py
