@@ -83,7 +83,7 @@ from gcrdt_client import CRDTGraphClient
 connection_string = "http://127.0.0.1:8081"
 instance = CRDTGraphClient(connection_string)
 ```
-- Clear database. A `broadcast()` request should be sent after any operation in the database instances to keep the data real-time synchronized among replicas. Although, of course, we can also send `broadcast()` request after a list of operations in the database, the rule of Last-Writer-Wins will solve any conflicts:
+- Clear database (A `broadcast()` request should be sent after any operation in the database instances to keep the data real-time synchronized among replicas. Although, of course, we can also send `broadcast()` request after a list of operations in the database, the rule of Last-Writer-Wins will solve any conflicts):
 ```python
 instance.clear() # clear all edges and vertices from the database
 instance.broadcast() # send new update to the network
