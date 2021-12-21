@@ -82,7 +82,7 @@ connection_string = "http://127.0.0.1:8081"
 instance = CRDTGraphClient(connection_string)
 ```
 
-- Clear database. It should be noted that a `broadcast()` request should be sent after any operation in the database intances to keep the data real-time synchornized among replicas. Ofcourse, we can also send `broadcast()` request after a set of operations in the database, any conlficts will be solve by the rule of Last-Writer-Wins:
+- Clear database. A `broadcast()` request should be sent after any operation in the database instances to keep the data real-time synchronized among replicas. Although, of course, we can also send `broadcast()` request after a list of operations in the database, the rule of Last-Writer-Wins will solve any conflicts:
 ```python
 instance.clear() # clear all edges and vertices from the database
 instance.broadcast() # send new update to the network
@@ -134,7 +134,7 @@ instance.add_edge(1, 3)
 print(instance.find_path(2, 3)) # [2, 1, 3]
 ```
 
-- Query for all vertices connected to a vertex:
+- Query all vertices connected to a vertex:
 ```python
 instance.add_vertex(1)
 instance.add_vertex(2)
