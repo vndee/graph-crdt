@@ -1,16 +1,15 @@
 ## graph-crdt
-A portable on-memory conflict-free replicated graph database
+A portable on-memory conflict-free replicated graph database.
 
-This project is a simple implementation of a conflict-free replicated graph database. The graph opeerations has been developed based on Last-Writer-Wins element set, which contains serveral basic operation as follow:
 
+This project is a simple implementation of a conflict-free replicated graph database. The graph operations have been developed based on the Last-Writer-Wins element set, which contains several essential functions as follow:
 - add a vertex/edge
 - remove a vertex/edge
 - check if a vertex/edge is in the graph
-- query for all vertices connected to a vertex
+- query all vertices connected to a vertex
 - find any path between two vertices
-- merge with concurrent changes from other graph/replica.
-
-This project come with a fully decentralization fashion which can merging data without any cordination between replicas. The core idea of this project is that each replica can work independently and when the replica connect to the database network, they can merge or receive updates from other replicas via the connection in the network. When a replica start, it should be assigned by an address and know exactly one friend (replica) who has already connected to the network. When a replica in the network receive a message that its friend has just registered to the network, it will broadcast information of this newcomer to the network and this message is sent to all network via connection between replica. This process keep the network always connected. When a replica send a merge request to the network, this message is also sent to all replicas since the network is always connected.
+- merge with concurrent changes from other graphs/replicas.
+This project comes with a full decentralization fashion which can merge data without any coordination between replicas. The core idea of this project is that each replica can work independently. When the replica connects to the database network, they can merge or receive updates from other replicas via the connection in the network. When a replica starts, it should be assigned an address and know exactly one friend (replica) in the network. After a replica in the network receives a message that its friend has just registered to the network, it will broadcast information of this newcomer to the whole network. This message will be to all replicas via the connection between replicas since the network is always connected. Likewise, when a replica sends a merge request to its friends, this message will also be sent to all other replicas. The Last-Writer-Wins data type will solve any conflict.
 
 ### Installation
 
