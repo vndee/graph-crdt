@@ -206,11 +206,6 @@ class CRDTGraph:
         edges_added = json.loads(edges_added)
         edges_removed = json.loads(edges_removed)
 
-        print(vertices_added)
-        print(vertices_removed)
-        print(edges_added)
-        print(edges_removed)
-
         for k, v in vertices_added.items():
             k = int(k)
             if k in self.vertices.added:
