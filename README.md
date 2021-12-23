@@ -2,6 +2,7 @@
 
 *A portable on-memory conflict-free replicated graph database.*
 
+*Note: This project has already only been tested on macOS Monetary.*
 
 This is a simple implementation of a conflict-free replicated graph database. The graph operations have been developed based on the Last-Writer-Wins element set, which contains several essential functions as follow:
 
@@ -32,9 +33,6 @@ Run the first database instance. It should be noted that the first instance of t
 docker run -d --name cluster_1 -p 8081:8000 -e ADDRESS=http://host.docker.internal:8081 \
 			-e FRIEND_ADDRESS=-1 gcrdt
 ```
-Due to the limitations of Docker for MacOS (https://docs.docker.com/desktop/mac/networking/), we should use `http://host.docker.internal` as the hostname. In Linux systems, we can use `http://127.0.0.1` of `http://localhost` instead.
- 
-From the second instance (replica), if we want it to be connected to the first instance's network, we must set the `FRIEND_ADDRESS` variable as the address of the instance already in the network. 
 
 For example:
 
