@@ -222,3 +222,26 @@ class CRDTGraphIntegrationTestCase(unittest.TestCase):
 - Back up data on disk to preserve the data even when all database instances is crashed.
 - Add authentication and authorization layer to the gateway.
 - Reduce network latency and broadcasting operations. We can develop a smarter routing algorithm to reduce the number of broadcasting operations. Our main objective is to minimize the longest path between any replica in the network, but we also don't want to keep too many connections (edge) in the network. That is why we need a "smarter" routing algorithm.
+
+### In-process correctness tests
+
+The graph core can be checked without starting peer servers:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+These tests cover undirected neighbor enumeration, removal of incoming and outgoing
+edges, live endpoints, shortest paths, side-effect-free reads, add-wins timestamp
+ties, and state merge laws for fixed valid snapshots. Reads retain both add and
+remove histories; this demo has no causal-stability protocol for safe compaction.
+Removing a vertex records removals for its currently visible incident edges, while
+an edge is visible only when both endpoints are visible. Concurrent remote edge
+updates still follow the existing timestamp policy.
+
+This remains a teaching implementation: wall-clock timestamps are not causal
+clocks, local clock rollback and skew are not solved, and graph state is not
+persisted. The in-process tests do not validate peer delivery, gateway security,
+or convergence under malformed messages. Existing `test/unit.py` and
+`test/integration.py` require the documented running servers; they are separate
+from this deterministic core suite.

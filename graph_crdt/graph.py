@@ -54,10 +54,8 @@ class CRDTGraph:
                     continue
 
                 if self.contains_vertex(node)[1]:
-                    _u, _node = u, node
-                    u, node = self.convert_edge(u, node)
                     if self.contains_edge(u, node)[1]:
-                        neighbors.append(_node)
+                        neighbors.append(node)
 
             return True, sorted(neighbors)
         except Exception as e:
@@ -86,14 +84,13 @@ class CRDTGraph:
         if self.contains_vertex(u)[1] is False:
             return False
 
+        # Capture visible incident edges before the vertex tombstone hides them.
+        # Iterating edge keys handles both incoming and outgoing directed edges.
+        incident = [edge for edge in list(self.edges.added)
+                    if u in edge and self.contains_edge(*edge)[1]]
         self.vertices.remove(u)
-
-        # remove all connected edges of u
-        for node in list(self.vertices.added.keys()):
-            if self.contains_vertex(node)[1]:
-                u, node = self.convert_edge(u, node)
-                if self.contains_edge(u, node)[1]:
-                    self.remove_edge(u, node)
+        for edge in incident:
+            self.edges.remove(edge)
 
         return True
 
@@ -115,14 +112,13 @@ class CRDTGraph:
         if removed_timestamp is None:
             return True, True
 
-        if added_timestamp >= removed_timestamp:
-            self.vertices.free_removed(u)
-            return True, True
-        else:
-            self.vertices.free_added(u)
-            return True, False
+        # Queries must not discard replicated history. Compaction needs a
+        # separate causal-stability protocol, which this demo does not provide.
+        return True, added_timestamp >= removed_timestamp
 
     def contains_edge(self, u, v):
+        if not self.contains_vertex(u)[1] or not self.contains_vertex(v)[1]:
+            return True, False
         u, v = self.convert_edge(u, v)
         added_timestamp, removed_timestamp = None, None
 
@@ -138,20 +134,17 @@ class CRDTGraph:
         if removed_timestamp is None:
             return True, True
 
-        if added_timestamp >= removed_timestamp:
-            self.edges.free_removed((u, v))
-            return True, True
-        else:
-            self.edges.free_added((u, v))
-            return True, False
+        return True, added_timestamp >= removed_timestamp
 
     def find_path(self, source, target):
         # Breath-first search for the shortest path between u and v
 
         try:
+            if not self.contains_vertex(source)[1] or not self.contains_vertex(target)[1]:
+                return False, []
             q = [source]
             head = 0
-            visited, trace = set(), dict()
+            visited, trace = {source}, dict()
             trace[source] = source
 
             while q.__len__() - head > 0:
@@ -167,6 +160,7 @@ class CRDTGraph:
                     if v in visited:
                         continue
 
+                    visited.add(v)
                     trace[v] = u
                     q.append(v)
 
