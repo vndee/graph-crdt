@@ -16,9 +16,24 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build -t gcrdt .
+    - name: Run deterministic graph tests
+      run: docker run --rm --entrypoint python gcrdt -m unittest discover -s tests -v
     - name: Run docker container
       run: ./run.sh
     - name: Run unit test
       run: python3 -m unittest test/unit.py
     - name: Run integration test
       run: python3 -m unittest test/integration.py
+    - name: Container diagnostics
+      if: failure()
+      run: |
+        for node in 1 2 3 4 5; do
+          docker logs "cluster_$node" || true
+        done
+    - name: Stop demo cluster
+      if: always()
+      run: |
+        for node in 1 2 3 4 5; do
+          docker rm -f "cluster_$node" || true
+        done
+        docker network rm gcrdt-demo || true

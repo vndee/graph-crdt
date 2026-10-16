@@ -50,6 +50,14 @@ chmod +x run.sh
 ./run.sh
 ```
 
+The script uses a dedicated `gcrdt-demo` Docker network and container DNS names
+for peer traffic, so it works on Linux without `host.docker.internal`. Client
+ports 8081–8085 are bound to loopback. Each node waits for its UDP worker and
+HTTP gateway before the next starts; CI runs both the deterministic core suite
+and the existing HTTP suites after readiness. The manual commands above assume
+Docker Desktop host-name resolution; prefer the script for the five-node demo.
+Remove the previous `cluster_1` through `cluster_5` demo containers before rerunning.
+
 ### Architecture
 
 
